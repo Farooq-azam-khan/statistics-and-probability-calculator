@@ -1,41 +1,51 @@
 import React from "react";
 import Select from "react-select";
 import { Row, Col } from "react-bootstrap";
+import operationOptions from "./OperationOptions";
+import distributionOptions from "./DistrbutionOptions";
+import DistributionParam from "./DistributionParam";
 
-const operationOptions = [
-  { value: "=", label: "=" },
-  { value: "<=", label: "<=" },
-  { value: ">=", label: ">=" },
-  { value: "<", label: "<" },
-  { value: ">", label: ">" }
-];
-
-const distributionOptions = [
-  { value: "geometric", label: "geometric" },
-  { value: "uniform-discrete", label: "uniform discrete" },
-  { value: "binomial", label: "binomial" },
-  { value: "poission", label: "poission" },
-  { value: "gamma", label: "gamma" },
-  { value: "exponential", label: "exponential" },
-  { value: "normal", label: "normal" }
-];
 export default class Distributions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       randomVariable: "X",
       lower: 0,
-      upper: 1,
-      operation: "<",
-      distribution: "",
+      upper: 8,
+      operation: operationOptions[0],
+      distribution: distributionOptions[0],
       mean: 0,
       variance: 0,
-      output: Math.random()
+      output: 0,
+      params: {}
     };
   }
 
-  calculateProbability = e => {
-    this.setState({ output: Math.random() });
+  componentDidMount() {
+    this.handleDistribution(this.state.distribution);
+  }
+
+  calculateProbability = () => {
+    let sumIt = 0;
+
+    const distrbFunc = this.state.distribution.func(this.state.params);
+    if (this.state.distribution.discrete) {
+      if (this.state.operation.value === "<=") {
+        for (let x = 0; x <= this.state.upper; x++) {
+          const p_of_x = distrbFunc.prob(x);
+          sumIt += p_of_x;
+        }
+      } else {
+        for (let x = 0; x < this.state.upper; x++) {
+          sumIt += distrbFunc.prob(x);
+        }
+      }
+
+      this.setState({ output: sumIt });
+    } else {
+    }
+
+    this.setState({ mean: distrbFunc.mean, variance: distrbFunc.var });
   };
 
   handleLower = e => {
@@ -52,7 +62,6 @@ export default class Distributions extends React.Component {
 
   handleOperation = operation => {
     this.setState({ operation }, () => {
-      console.log(`Option selected:`, this.state.operation);
       this.calculateProbability();
     });
   };
@@ -62,17 +71,37 @@ export default class Distributions extends React.Component {
   };
 
   handleDistribution = distribution => {
-    this.setState({ distribution }, () => {
+    this.setState({ distribution, params: { ...distribution.params } }, () => {
       this.calculateProbability();
     });
   };
+
+  applyDistFunction = () => {
+    const newDist = { ...this.state.distribution };
+    const currentState = this.state;
+    currentState.mean = newDist.func(this.state.params).mean;
+    currentState.variance = newDist.func(this.state.params).variance;
+    this.setState(currentState);
+    console.log(this.state);
+  };
+
+  handleParamsChange = e => {
+    const targetId = e.target.id;
+    const newParams = { ...this.state.params };
+    newParams[targetId] = e.target.value;
+    this.setState({ params: newParams }, () => {
+      this.applyDistFunction();
+      this.calculateProbability();
+    });
+  };
+
   render() {
     return (
       <div>
         <h2>Calculate Probability</h2>
         <Row>
           <Col xs="2">
-            <label for="rand-var">Random Variable:</label>{" "}
+            <label htmlFor="rand-var">Random Variable:</label>{" "}
             <input
               className="form-control"
               id="rand-var"
@@ -82,29 +111,25 @@ export default class Distributions extends React.Component {
             />
           </Col>
           <Col xs="4">
-            <label for="select-op">Select Value: </label>
+            <label htmlFor="select-op">Select Value: </label>
             <Select
               id="select-op"
-              // defaultMenuIsOpen={true}
-              // defaultInputValue={operationOptions[0].label}
               value={this.state.operation}
               onChange={this.handleOperation}
               options={operationOptions}
             />
           </Col>
           <Col xs="4">
-            <label for="select-dist">Select Distribution: </label>
+            <label htmlFor="select-dist">Select Distribution: </label>
             <Select
               id="select-dist"
-              // defaultMenuIsOpen={true}
-              // defaultInputValue={operationOptions[0].label}
               value={this.state.distribution}
               onChange={this.handleDistribution}
               options={distributionOptions}
             />
           </Col>
           <Col xs="2">
-            <label for="upper-bound-value">Upper value:</label>{" "}
+            <label htmlFor="upper-bound-value">Upper value:</label>{" "}
             <input
               className="form-control"
               id="upper-bound-value"
@@ -114,6 +139,35 @@ export default class Distributions extends React.Component {
             />
           </Col>
         </Row>
+        <div
+          style={{
+            display: "flex",
+            backgroundColor: "lightgreen",
+            margin: "2rem",
+            padding: "1rem",
+            textAlign: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Col xs={2}>
+            {Object.keys(this.state.params).map(k => {
+              return (
+                <div key={k}>
+                  <DistributionParam
+                    keyName={k}
+                    param={this.state.params[k]}
+                    onChange={this.handleParamsChange}
+                  />
+                </div>
+              );
+            })}
+          </Col>
+          <Col>
+            {`${this.state.randomVariable} ~ ${
+              this.state.distribution.value
+            }(${getDistrbutionParams(this.state.params)})`}
+          </Col>
+        </div>
         <Row
           style={{
             display: "flex",
@@ -148,74 +202,16 @@ export default class Distributions extends React.Component {
           </Col>
           <Col>{`Sd(X) = ${Math.sqrt(this.state.variance)}`}</Col>
         </Row>
-        <div
-          style={{
-            backgroundColor: "red",
-            margin: "2rem",
-            padding: "2rem",
-            textAlign: "center",
-            color: "white",
-            justifyContent: "center"
-          }}
-        >
-          <h3>Distribution Test</h3>
-          <h4>Geometric</h4>
-          <div>{geometricDistribution(0.01).prob(10)}</div>
-          <div>{geometricDistribution(0.01).mean}</div>
-          <div>{geometricDistribution(0.01).var}</div>
-          <h4>Binomial</h4>
-          <div>{binomialDistribution(8, 0.2).prob(2)}</div>
-          <div>{binomialDistribution(8, 0.2).mean}</div>
-          <div>{binomialDistribution(8, 0.2).var}</div>
-        </div>
       </div>
     );
   }
 }
 
-function factorial(x) {
-  // validating the input
-  x = parseInt(x, 10);
-  if (isNaN(x)) return 1;
-
-  // if x below 0, return 1
-  if (x <= 0) return 1;
-  // if x above 170, return infinity
-  if (x > 170) return Infinity;
-  // calculating the factorial
-  var y = 1;
-  for (var i = x; i > 0; i--) {
-    y *= i;
+const getDistrbutionParams = params => {
+  // console.log({ dist });
+  let str = "";
+  for (let p in params) {
+    str += `${p}=${params[p]},`; //  = ${dist[params][p]}`;
   }
-  return y;
-}
-
-function choose(n, k) {
-  // validating the input
-  n = parseInt(n, 10);
-  if (isNaN(n)) n = 0;
-  if (n < 0) n = 0;
-
-  k = parseInt(k, 10);
-  if (isNaN(k)) k = 0;
-  if (k < 0) k = 0;
-  if (k > n) k = n;
-
-  return factorial(n) / (factorial(k) * factorial(n - k));
-}
-
-const geometricDistribution = p => {
-  return {
-    prob: x => Math.pow(1 - p, x - 1) * p,
-    mean: 1 / p,
-    var: (1 - p) / (p * p)
-  };
-};
-
-const binomialDistribution = (n, p) => {
-  return {
-    prob: x => choose(n, x) * Math.pow(p, x) * Math.pow(1 - p, n - x),
-    mean: p,
-    var: (1 - p) * p
-  };
+  return str;
 };
