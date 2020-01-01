@@ -82,7 +82,6 @@ export default class Distributions extends React.Component {
     currentState.mean = newDist.func(this.state.params).mean;
     currentState.variance = newDist.func(this.state.params).variance;
     this.setState(currentState);
-    console.log(this.state);
   };
 
   handleParamsChange = e => {
@@ -200,7 +199,9 @@ export default class Distributions extends React.Component {
           <Col>
             {`Var(${this.state.randomVariable}) = ${this.state.variance}`}
           </Col>
-          <Col>{`Sd(X) = ${Math.sqrt(this.state.variance)}`}</Col>
+          <Col>{`Sd(${this.state.randomVariable}) = ${Math.sqrt(
+            this.state.variance
+          )}`}</Col>
         </Row>
       </div>
     );
@@ -208,10 +209,7 @@ export default class Distributions extends React.Component {
 }
 
 const getDistrbutionParams = params => {
-  // console.log({ dist });
-  let str = "";
-  for (let p in params) {
-    str += `${p}=${params[p]},`; //  = ${dist[params][p]}`;
-  }
-  return str;
+  return Object.keys(params).map(p => {
+    return `${p}=${params[p]}`;
+  });
 };
