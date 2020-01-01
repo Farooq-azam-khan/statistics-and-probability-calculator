@@ -9,6 +9,15 @@ const operationOptions = [
   { value: ">", label: ">" }
 ];
 
+const distributionOptions = [
+  { value: "geometric", label: "geometric" },
+  { value: "uniform-discrete", label: "uniform discrete" },
+  { value: "binomial", label: "binomial" },
+  { value: "poission", label: "poission" },
+  { value: "gamma", label: "gamma" },
+  { value: "exponential", label: "exponential" },
+  { value: "normal", label: "normal" }
+];
 export default class Distributions extends React.Component {
   constructor(props) {
     super(props);
@@ -17,6 +26,7 @@ export default class Distributions extends React.Component {
       lower: 0,
       upper: 1,
       operation: "<",
+      distribution: "",
       output: Math.random()
     };
   }
@@ -47,6 +57,12 @@ export default class Distributions extends React.Component {
   handleRandomVar = e => {
     this.setState({ randomVariable: e.target.value });
   };
+
+  handleDistribution = distribution => {
+    this.setState({ distribution }, () => {
+      this.calculateProbability();
+    });
+  };
   render() {
     return (
       <div>
@@ -64,9 +80,20 @@ export default class Distributions extends React.Component {
           <label for="select-op">Select Value: </label>
           <Select
             id="select-op"
+            // defaultMenuIsOpen={true}
+            // defaultInputValue={operationOptions[0].label}
             value={this.state.operation}
             onChange={this.handleOperation}
             options={operationOptions}
+          />
+          <label for="select-dist">Select Distribution: </label>
+          <Select
+            id="select-dist"
+            defaultMenuIsOpen={true}
+            // defaultInputValue={operationOptions[0].label}
+            value={this.state.distribution}
+            onChange={this.handleDistribution}
+            options={distributionOptions}
           />
           <label for="upper-bound-value">Upper value:</label>{" "}
           <input
@@ -86,11 +113,11 @@ export default class Distributions extends React.Component {
             }}
           >
             <div>
-              P(
-              {this.state.randomVariable +
-                this.state.operation +
-                this.state.upper}
-              ) = {this.state.output}
+              {`P(${this.state.randomVariable} ${
+                this.state.operation.value
+                  ? this.state.operation.value
+                  : "Operation?"
+              } ${this.state.upper}) = ${this.state.output}`}
             </div>
           </div>
         </div>
