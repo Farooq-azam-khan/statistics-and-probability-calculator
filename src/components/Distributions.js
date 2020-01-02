@@ -3,7 +3,10 @@ import Select from "react-select";
 import { Row, Col } from "react-bootstrap";
 import operationOptions from "./OperationOptions";
 import distributionOptions from "./DistrbutionOptions";
-import DistributionParam from "./DistributionParam";
+import DisplayExpectations from "./DisplayExpectations";
+import DisplayProbability from "./DisplayProbability";
+import DisplayDistribution from "./DisplayDistribution";
+import DisplayParams from "./DisplayParams";
 
 export default class Distributions extends React.Component {
   constructor(props) {
@@ -27,20 +30,31 @@ export default class Distributions extends React.Component {
 
   calculateProbability = () => {
     let sumIt = 0;
+    const upper = this.state.upper;
+    const operationValue = this.state.operation.value;
 
     const distrbFunc = this.state.distribution.func(this.state.params);
     if (this.state.distribution.discrete) {
-      if (this.state.operation.value === "<=") {
-        for (let x = 0; x <= this.state.upper; x++) {
-          const p_of_x = distrbFunc.prob(x);
-          sumIt += p_of_x;
-        }
-      } else {
-        for (let x = 0; x < this.state.upper; x++) {
-          sumIt += distrbFunc.prob(x);
-        }
+      // TODO: apply the central limit theorem here
+      // also might need a switch statement
+      if (operationValue === "<=") {
+        sumIt = sumUpToX(upper, distrbFunc) + distrbFunc.prob(upper);
+        // for (let x = 0; x <= this.state.upper; x++) {
+        //   const p_of_x = distrbFunc.prob(x);
+        //   sumIt += p_of_x;
+        // }
+      } else if (operationValue === "<") {
+        sumIt = sumUpToX(upper, distrbFunc);
+        // for (let x = 0; x < this.state.upper; x++) {
+        //   sumIt += distrbFunc.prob(x);
+        // }
+      } else if (operationValue === ">") {
+        sumIt = 1 - (sumUpToX(upper, distrbFunc) + distrbFunc.prob(upper));
+      } else if (operationValue === ">=") {
+        sumIt = 1 - sumUpToX(upper, distrbFunc);
+      } else if (operationValue === "=") {
+        sumIt = distrbFunc.prob(upper);
       }
-
       this.setState({ output: sumIt });
     } else {
     }
@@ -100,7 +114,7 @@ export default class Distributions extends React.Component {
         <h2>Calculate Probability</h2>
         <Row>
           <Col xs="2">
-            <label htmlFor="rand-var">Random Variable:</label>{" "}
+            <label htmlFor="rand-var">Random Variable:</label>
             <input
               className="form-control"
               id="rand-var"
@@ -128,7 +142,7 @@ export default class Distributions extends React.Component {
             />
           </Col>
           <Col xs="2">
-            <label htmlFor="upper-bound-value">Upper value:</label>{" "}
+            <label htmlFor="upper-bound-value">Upper value:</label>
             <input
               className="form-control"
               id="upper-bound-value"
@@ -138,35 +152,17 @@ export default class Distributions extends React.Component {
             />
           </Col>
         </Row>
-        <div
-          style={{
-            display: "flex",
-            backgroundColor: "lightgreen",
-            margin: "2rem",
-            padding: "1rem",
-            textAlign: "center",
-            justifyContent: "center"
-          }}
-        >
-          <Col xs={2}>
-            {Object.keys(this.state.params).map(k => {
-              return (
-                <div key={k}>
-                  <DistributionParam
-                    keyName={k}
-                    param={this.state.params[k]}
-                    onChange={this.handleParamsChange}
-                  />
-                </div>
-              );
-            })}
-          </Col>
-          <Col>
-            {`${this.state.randomVariable} ~ ${
-              this.state.distribution.value
-            }(${getDistrbutionParams(this.state.params)})`}
-          </Col>
-        </div>
+
+        <DisplayParams
+          params={this.state.params}
+          onChange={this.handleParamsChange}
+        />
+        <DisplayDistribution
+          randomVariable={this.state.randomVariable}
+          params={this.state.params}
+          value={this.state.distribution.value}
+        />
+
         <Row
           style={{
             display: "flex",
@@ -177,39 +173,28 @@ export default class Distributions extends React.Component {
             justifyContent: "center"
           }}
         >
-          <Row>
-            {`P(${this.state.randomVariable} ${
-              this.state.operation.value
-                ? this.state.operation.value
-                : "Operation?"
-            } ${this.state.upper}) = ${this.state.output}`}
-          </Row>
+          <DisplayProbability
+            randomVariable={this.state.randomVariable}
+            value={this.state.operation.value}
+            upper={this.state.upper}
+            output={this.state.output}
+          />
         </Row>
-        <Row
-          style={{
-            backgroundColor: "orange",
-            margin: "2rem",
-            padding: "2rem",
-            textAlign: "center",
-            color: "black",
-            justifyContent: "center"
-          }}
-        >
-          <Col>{`Mean = ${this.state.mean}`}</Col>
-          <Col>
-            {`Var(${this.state.randomVariable}) = ${this.state.variance}`}
-          </Col>
-          <Col>{`Sd(${this.state.randomVariable}) = ${Math.sqrt(
-            this.state.variance
-          )}`}</Col>
-        </Row>
+        <DisplayExpectations
+          mean={this.state.mean}
+          variance={this.state.variance}
+          randomVariable={this.state.randomVariable}
+        />
       </div>
     );
   }
 }
 
-const getDistrbutionParams = params => {
-  return Object.keys(params).map(p => {
-    return `${p}=${params[p]}`;
-  });
+const sumUpToX = (upper, distrbFunc) => {
+  let sumIt = 0;
+  for (let x = 0; x < upper; x++) {
+    const p_of_x = distrbFunc.prob(x);
+    sumIt += p_of_x;
+  }
+  return sumIt;
 };
