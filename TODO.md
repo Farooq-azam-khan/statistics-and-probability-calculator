@@ -8,3 +8,7 @@
 - [ ] implement react routers
 - [ ] display distribution function graphs
 - [ ] make tests
+- [ ] create route for distribution which shows all distribution
+  - [ ] onclick of distribution it shows the formula and the mean and their graph
+- [ ] install react router, mathjax, d3
+- [ ] add proptypes to components

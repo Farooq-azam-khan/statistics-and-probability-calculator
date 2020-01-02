@@ -1,12 +1,12 @@
 import React from "react";
-import Select from "react-select";
-import { Row, Col } from "react-bootstrap";
+import { Row } from "react-bootstrap";
 import operationOptions from "./OperationOptions";
 import distributionOptions from "./DistrbutionOptions";
 import DisplayExpectations from "./DisplayExpectations";
 import DisplayProbability from "./DisplayProbability";
 import DisplayDistribution from "./DisplayDistribution";
 import DisplayParams from "./DisplayParams";
+import DisplayDistrbutionForm from "./DisplayDistributionForm";
 
 export default class Distributions extends React.Component {
   constructor(props) {
@@ -30,24 +30,18 @@ export default class Distributions extends React.Component {
 
   calculateProbability = () => {
     let sumIt = 0;
+
     const upper = this.state.upper;
     const operationValue = this.state.operation.value;
-
     const distrbFunc = this.state.distribution.func(this.state.params);
+
     if (this.state.distribution.discrete) {
       // TODO: apply the central limit theorem here
       // also might need a switch statement
       if (operationValue === "<=") {
         sumIt = sumUpToX(upper, distrbFunc) + distrbFunc.prob(upper);
-        // for (let x = 0; x <= this.state.upper; x++) {
-        //   const p_of_x = distrbFunc.prob(x);
-        //   sumIt += p_of_x;
-        // }
       } else if (operationValue === "<") {
         sumIt = sumUpToX(upper, distrbFunc);
-        // for (let x = 0; x < this.state.upper; x++) {
-        //   sumIt += distrbFunc.prob(x);
-        // }
       } else if (operationValue === ">") {
         sumIt = 1 - (sumUpToX(upper, distrbFunc) + distrbFunc.prob(upper));
       } else if (operationValue === ">=") {
@@ -112,47 +106,16 @@ export default class Distributions extends React.Component {
     return (
       <div>
         <h2>Calculate Probability</h2>
-        <Row>
-          <Col xs="2">
-            <label htmlFor="rand-var">Random Variable:</label>
-            <input
-              className="form-control"
-              id="rand-var"
-              type="text"
-              value={this.state.randomVariable}
-              onChange={this.handleRandomVar}
-            />
-          </Col>
-          <Col xs="4">
-            <label htmlFor="select-op">Select Value: </label>
-            <Select
-              id="select-op"
-              value={this.state.operation}
-              onChange={this.handleOperation}
-              options={operationOptions}
-            />
-          </Col>
-          <Col xs="4">
-            <label htmlFor="select-dist">Select Distribution: </label>
-            <Select
-              id="select-dist"
-              value={this.state.distribution}
-              onChange={this.handleDistribution}
-              options={distributionOptions}
-            />
-          </Col>
-          <Col xs="2">
-            <label htmlFor="upper-bound-value">Upper value:</label>
-            <input
-              className="form-control"
-              id="upper-bound-value"
-              type="number"
-              value={this.state.upper}
-              onChange={this.handleUpper}
-            />
-          </Col>
-        </Row>
-
+        <DisplayDistrbutionForm
+          randomVariable={this.state.randomVariable}
+          handleRandomVar={this.handleRandomVar}
+          operation={this.state.operation}
+          handleOperation={this.handleOperation}
+          distribution={this.state.distribution}
+          handleDistribution={this.handleDistribution}
+          upper={+this.state.upper}
+          handleUpper={this.handleUpper}
+        />
         <DisplayParams
           params={this.state.params}
           onChange={this.handleParamsChange}
