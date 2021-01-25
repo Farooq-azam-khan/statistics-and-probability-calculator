@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {},
   "scripts": {
-    "dev": "elm-live src/Main.elm -p 8000 -- --debug"
+    "dev": "elm-live src/Main.elm -p 8000 -- --debug --output=elm.js"
   },
   "browserslist": {
     "production": [
