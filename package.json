@@ -1,34 +1,10 @@
 {
-  "homepage": "https://farooq-azam-khan.github.io/react-stats-prob/",
-  "name": "prob-stats-app",
+  "name": "statistics-and-probabilty-calculator",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "bootstrap": "^4.4.1",
-    "prop-types": "^15.7.2",
-    "react": "^16.12.0",
-    "react-bootstrap": "^1.0.0-beta.16",
-    "react-dom": "^16.12.0",
-    "react-redux": "^7.1.3",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.3.0",
-    "react-select": "^3.0.8",
-    "redux": "^4.0.5",
-    "serialize-javascript": ">=3.1.0"  
-  },
+  "dependencies": {},
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build -b gh-pages",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+    "dev": "elm-live src/Main.elm -p 8000 -- --debug"
   },
   "browserslist": {
     "production": [
