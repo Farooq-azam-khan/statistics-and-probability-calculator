@@ -16,9 +16,9 @@ type Lambda
 
 
 type Distribution
-    = Binomial Int Probability
-    | Geometric Probability
-    | Poission Lambda
+    = Binomial (Maybe Int) (Maybe Probability)
+    | Geometric (Maybe Probability)
+    | Poission (Maybe Lambda)
 
 
 e : Float
@@ -26,30 +26,52 @@ e =
     2.718281828459045
 
 
-mean : Distribution -> Float
+mean : Distribution -> Maybe Float
 mean d =
     case d of
-        Binomial _ (Probability p) ->
-            p
+        Binomial _ (Just (Probability p)) ->
+            Just p
 
-        Geometric (Probability p) ->
-            1 / p
+        Binomial _ Nothing ->
+            Nothing
 
-        Poission (Lambda l) ->
-            l
+        Geometric (Just (Probability p)) ->
+            if p /= 0 then
+                Just (1 / p)
+
+            else
+                Nothing
+
+        Geometric Nothing ->
+            Nothing
+
+        Poission (Just (Lambda l)) ->
+            Just l
+
+        Poission Nothing ->
+            Nothing
 
 
-variance : Distribution -> Float
+variance : Distribution -> Maybe Float
 variance d =
     case d of
-        Binomial _ (Probability p) ->
-            (1 - p) * p
+        Binomial _ (Just (Probability p)) ->
+            Just ((1 - p) * p)
 
-        Geometric (Probability p) ->
-            (1 - p) / (p * p)
+        Binomial _ Nothing ->
+            Nothing
 
-        Poission (Lambda l) ->
-            l
+        Geometric (Just (Probability p)) ->
+            Just ((1 - p) / (p * p))
+
+        Geometric Nothing ->
+            Nothing
+
+        Poission (Just (Lambda l)) ->
+            Just l
+
+        Poission Nothing ->
+            Nothing
 
 
 factorial : Int -> Int
@@ -70,10 +92,10 @@ choose n k =
         factorial n // (factorial n * factorial (n - k))
 
 
-probability : Distribution -> Int -> Float
+probability : Distribution -> Int -> Maybe Float
 probability d x =
     case d of
-        Binomial n (Probability p) ->
+        Binomial (Just n) (Just (Probability p)) ->
             let
                 c1 =
                     toFloat (choose n x)
@@ -84,16 +106,22 @@ probability d x =
                 c3 =
                     (1 - p) ^ Basics.toFloat (n - x)
             in
-            c1 * c2 * c3
+            Just (c1 * c2 * c3)
 
-        Geometric (Probability p) ->
+        Binomial _ _ ->
+            Nothing
+
+        Geometric (Just (Probability p)) ->
             let
                 c1 =
                     (1 - p) ^ (toFloat x - 1)
             in
-            c1 * p
+            Just (c1 * p)
 
-        Poission (Lambda lamb) ->
+        Geometric _ ->
+            Nothing
+
+        Poission (Just (Lambda lamb)) ->
             let
                 c1 =
                     lamb ^ toFloat x
@@ -101,7 +129,10 @@ probability d x =
                 c2 =
                     e ^ (-1 * lamb)
             in
-            (c1 * c2) / toFloat (factorial x)
+            Just ((c1 * c2) / toFloat (factorial x))
+
+        Poission _ ->
+            Nothing
 
 
 type alias Model =
