@@ -277,7 +277,7 @@ methods_of_enumeration =
                     ]
                 , tr []
                     [ td [] [ text "TRUE" ]
-                    , td [] [ text "n^r" ]
+                    , td [] [ text "\\(n^r\\)" ]
                     , td [] [ text "(n+r-1) 'choose' r" ]
                     ]
                 , tr []
@@ -324,9 +324,9 @@ discrete_random_variables =
                 , dd []
                     [ p [] [ text "The probability Mass Function denoted as P(X = x) = f(x) of a discrete random variable X is function that satifiles the following properties." ]
                     , ol []
-                        [ li [] [ text "f(x) > 0, x in S;" ]
-                        , li [] [ text "Sum_{x in S} f(x) = 1" ]
-                        , li [] [ text "P(X in A) = Sum_{x in A} f(x), where A subset of S" ]
+                        [ li [] [ text "\\[ f(x) > 0, x \\in S; \\]" ]
+                        , li [] [ text "\\[ \\sum_{x \\in S} f(x) = 1; \\]" ]
+                        , li [] [ text "\\[ P(X \\in A) = \\sum_{x \\in A} f(x) \\], where \\(A \\subset S \\)" ]
                         ]
                     , p [] [ text "where S is the Support of X" ]
                     ]
@@ -416,24 +416,103 @@ mathematical_expectation =
                         [ text "M_{X} (t) = E[e^{tX}] = Sum_{x in S} e^{tx} f(x)" ]
                     ]
                 , div []
-                    [ p [] [ text "Theorem M_{X}^{(r)} (0) = E[X^r]" ]
+                    [ p [] [ text "Theorem \\[ M_{X}^{(r)} (0) = E[X^r] \\]" ]
                     , div [] [ p [] [ text "Proof TODO" ] ]
                     ]
                 ]
             , geometric_distribution
+            , binomial_distribution
+            , hyper_geometric_distribution
+            , poission_distribution
+            ]
+        ]
+
+
+pmf_poission_latex : String
+pmf_poission_latex =
+    "\\[ f(x) = \\frac {e^{-\\lambda} \\lambda^x} {x!}, \\quad \\lambda > 0 \\] or more generally for any time interval \\(t\\),  \\[f(x) = \\frac {e^{-t\\lambda} (\\lambda t)^x} {x!} \\]"
+
+
+mgf_poission_latex : String
+mgf_poission_latex =
+    "\\[  M(t) = e^{\\lambda (e^t - 1)}, -\\infty < \\lambda < \\infty \\]"
+
+
+mean_poission_latex : String
+mean_poission_latex =
+    "Mean: \\(\\lambda\\)"
+
+
+variance_poission_latex : String
+variance_poission_latex =
+    "Variance: \\(\\lambda\\)"
+
+
+poission_distribution : Html Msg
+poission_distribution =
+    section [ id "poission-distribution" ]
+        [ h3 [] [ text "Poission Distribution" ]
+        , p [] [ text "Let the discrte random variable \\(X\\) denote the number of times an event occurs at one time (or space) interval." ]
+        , p [] [ text pmf_poission_latex, text mgf_poission_latex ]
+        , p [] [ text mean_poission_latex, text " ", text variance_poission_latex ]
+        ]
+
+
+hyper_geometric_distribution : Html Msg
+hyper_geometric_distribution =
+    section [ id "hypter-geometric-distribution" ]
+        [ h3 [] [ text "Hyper Geometric Distribution" ]
+        , div []
+            [ text "\\[ f(x) = \\frac {{m \\choose x} {N-m \\choose n-x}} {N \\choose n} \\]"
+            , ul []
+                [ li [] [ text "where \\(N\\) is the total number of objects belonging to two dichotomous classes;" ]
+                , li [] [ text "\\(m\\) is the number of objects belonging to one certail class;" ]
+                , li [] [ text "\\(n\\) is the number of objects to be selected without replacement;" ]
+                , li [] [ text "\\(x\\) is number of selected objects belonging to one class." ]
+                ]
             ]
         ]
 
 
 geometric_distribution : Html Msg
 geometric_distribution =
-    section []
-        [ ol []
-            [ li [] [ text "mgf: M(t) = pe^t / (1 - qe^t)" ]
-            , li [] [ text "First Moment: E[X] = 1/p" ]
-            , li [] [ text "Second Moment: E[X^2] = (1+q) / p^2" ]
-            , li [] [ text "Variance: q/p^2" ]
+    section [ id "geometric-distribution" ]
+        [ h3 [] [ text "The Geometric distribution" ]
+        , ol []
+            [ li [] [ text "mgf: \\( M(t) = pe^t / (1 - qe^t) \\)" ]
+            , li [] [ text "First Moment:\\( E[X] = 1/p \\)" ]
+            , li [] [ text "Second Moment: \\(E[X^2] = (1+q) / p^2//)" ]
+            , li [] [ text "Variance: \\(q/p^2\\)" ]
             ]
+        ]
+
+
+binomial_distribution : Html Msg
+binomial_distribution =
+    section [ id "binomial-distribution" ]
+        [ h3 [] [ text "The Binomial Distribution" ]
+        , dl []
+            [ dt [] [ text "pmf of Binomial Distribution" ]
+            , dd []
+                [ p [] [ text "\\[ f(x)  = {n \\choose x} p^x(1-p)^{n-x} \\]" ]
+                , p [] [ text "\\[ X \\thicksim b(n,p) \\]" ]
+                , p [] [ text "\\( \\thicksim \\) means \"is distributed as\" and \\(n\\) and \\(p\\) are the parameters to the binomial distribution." ]
+                ]
+            ]
+        , h4 [] [ text "The Binomial Setting" ]
+        , ul []
+            [ li [] [ text "A trial is performed the same way \\(n\\) times;" ]
+            , li [] [ text "Each of the \\(n\\) trials has exactly two outcomes;" ]
+            , li [] [ text "The \\(n\\) trials are independent" ]
+            , li [] [ text "The probability of success, denoted \\(p\\), is the same for each trial. Probability of failure: \\(q=1-p\\)." ]
+            ]
+        , h4 [] [ text "MGF, Mean, Variance, and STD of Binomial Distribution" ]
+        , ul []
+            [ li [] [ text "\\[ M(t) = [(1-p) + pe^t]^n \\]" ]
+            , li [] [ text "\\[ \\mu = np \\]" ]
+            , li [] [ text "\\[\\sigma^2 = np(1-p) \\]" ]
+            ]
+        , p [] [ text "TODO: proof" ]
         ]
 
 
