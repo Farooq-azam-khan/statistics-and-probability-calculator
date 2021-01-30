@@ -24,3 +24,5 @@ yarn-error.log*
 
 elm-stuff
 elm.js
+
+tailwind.css
