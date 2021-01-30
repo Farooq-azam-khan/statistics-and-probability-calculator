@@ -235,12 +235,155 @@ update msg model =
                     { model | selected_distribution = Binomial unchanged_n Nothing }
 
 
+introduction : Html Msg
+introduction =
+    section []
+        [ h2 [] [ text "Introduction to Probability" ]
+        , dl []
+            [ dt [] [ text "Random Experiment" ]
+            , dd [] [ text "A random experiment is an experiment where the outcome cannot be predicted with certainty." ]
+            , dt [] [ text "Independence" ]
+            , dd [] [ text "Two phenomina are Independent if observing the outcome of the first does not affect the probability of observing the second. P(A and B) = P(A) * P(B)" ]
+            ]
+        ]
+
+
+methods_of_enumeration : Html Msg
+methods_of_enumeration =
+    section []
+        [ h2 [] [ text "Methods of Enummeration" ]
+        , ul []
+            [ li [] [ a [ href "#multiplication-principle" ] [ text "Multiplication Principle" ] ]
+            , li [] [ a [ href "#permutation" ] [ text "Permutation" ] ]
+            , li [] [ a [ href "#combinatorics" ] [ text "Combinatorics" ] ]
+            , li [] [ a [ href "#sampling-with-and-without-replacement" ] [ text "Sampling with and Without Replacement" ] ]
+            ]
+        , div [ id "multiplication-principle" ]
+            [ h3 [] [ text "Multiplication Principle" ]
+            , p [] []
+            ]
+        , div [ id "permutation" ] [ h3 [] [ text "Permutation" ] ]
+        , div [ id "combinatorics" ] [ h3 [] [ text "Combinatorics" ] ]
+        , div [ id "sampling-with-and-without-replacement" ]
+            [ h3 [] [ text "Sampling with and without Replacement" ]
+            , table []
+                [ tr []
+                    [ th []
+                        [ text "Replacement \\ Order" ]
+                    , th
+                        []
+                        [ text "TRUE" ]
+                    , th [] [ text "FALSE" ]
+                    ]
+                , tr []
+                    [ td [] [ text "TRUE" ]
+                    , td [] [ text "n^r" ]
+                    , td [] [ text "(n+r-1) 'choose' r" ]
+                    ]
+                , tr []
+                    [ td [] [ text "FALSE" ]
+                    , td [] [ text "n 'permute' r" ]
+                    , td [] [ text "n 'choose' r" ]
+                    ]
+                ]
+            ]
+        ]
+
+
+discrete_random_variables : Html Msg
+discrete_random_variables =
+    section []
+        [ h2 [] [ text "Discrete Random Variables" ]
+        , ul []
+            [ li []
+                [ a [ href "#random-variable" ] [ text "Random Variable" ] ]
+            , li
+                []
+                [ a
+                    [ href "#probability-mass-function"
+                    ]
+                    [ text "Probability Mass Function" ]
+                ]
+            , li []
+                [ a [ href "#cummulative-distribution-function" ] [ text "Cummulative Distribution Function" ]
+                ]
+            ]
+        , div [ id "random-variable" ]
+            [ h3 [] [ text "Random Variable" ]
+            , dl []
+                [ dt [] [ text "Random Variable" ]
+                , dd [] [ text "Given a random experiment with an outcome space S, a function X that assigns one and only one real number X(s) = x to each element s in S. The space of X is the set of all real numbers. {x : X(s) = x | s in S}." ]
+                , dt [] [ text "Discrete Random Variable" ]
+                , dd [] [ text "A random variable X is a discrete random variable if and only if: 1. there are a finite number of possible outcomes of X; 2. there are a countably infinite number of possible outcomes of X." ]
+                ]
+            ]
+        , div [ id "probability-mass-function" ]
+            [ h3 [] [ text "Probability Mass Function" ]
+            , dl []
+                [ dt [] [ text "Probability Mass Function (pmf)" ]
+                , dd []
+                    [ p [] [ text "The probability Mass Function denoted as P(X = x) = f(x) of a discrete random variable X is function that satifiles the following properties." ]
+                    , ol []
+                        [ li [] [ text "f(x) > 0, x in S;" ]
+                        , li [] [ text "Sum_{x in S} f(x) = 1" ]
+                        , li [] [ text "P(X in A) = Sum_{x in A} f(x), where A subset of S" ]
+                        ]
+                    , p [] [ text "where S is the Support of X" ]
+                    ]
+                ]
+            , p [] [ text "Example: let f(x) = c * x^2 for x = 1,2,3. Find the constant c such that it satisfies the probability mass function." ]
+            ]
+        , div [ id "cummulative-distribution-function" ]
+            [ h3 [] [ text "Cummulative Distribution Function" ]
+            , dl []
+                [ dt []
+                    [ text "Cummulative Distribution Function (cdf)" ]
+                , dd
+                    []
+                    [ p [] [ text "X takes discrete values from 0 to k" ]
+                    , p [] [ text "F(x) = P(X <= x)" ]
+                    , p [] [ text "F(x) = Sum_{m = 0}^{x} f(m)" ]
+                    , p [] [ text "and P(X > x) = 1 - P(X <= x)" ]
+                    ]
+                ]
+            ]
+        ]
+
+
+mathematical_expectation : Html Msg
+mathematical_expectation =
+    section []
+        [ h2 [] [ text "Mathematical Expectation" ]
+        , ul []
+            [ li [] [ a [ href "#expectation" ] [ text "Expectation" ] ]
+            , li [] [ a [ href "#mean-of-X" ] [ text "Mean of Random Variable X" ] ]
+            , li [] [ a [ href "#variance-of-X" ] [ text "Variance and Standard Deviation of X" ] ]
+            ]
+        , div [ id "expectation" ]
+            [ h3 [] [ text "Expectation" ]
+            , dl []
+                [ dt [] [ text "Expectation" ]
+                , dd []
+                    [ p [] [ text "if f(x) is the pmf of a discrete random variable X with support S, and if the Sum_{x in S} u(x)f(x) exists (does not go to infinity) then the resulting sum is the expectation, or the expectation value of the function u(x)." ]
+                    , p [] [ text "It is denoted as E[u(X)] = Sum_{x in S} u(x) f(x)" ]
+                    ]
+                ]
+            ]
+        , div [ id "mean-of-X" ] [ h3 [] [ text "Mean of Random Variable X" ] ]
+        , div [ id "variance-of-x" ] [ h3 [] [ text "Variance and Standard Deviation of X" ] ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
     div []
         [ h1 []
-            [ text "Statistics and Probability Calculator" ]
-        , span [] [ text "Selected Distribution" ]
+            [ text "Statistics and Probability" ]
+        , introduction
+        , methods_of_enumeration
+        , discrete_random_variables
+        , mathematical_expectation
+        , p [] [ text "Selected Distribution" ]
         , div []
             [ div []
                 [ button [ onClick SelectGeometric ] [ text "Geometric" ]
