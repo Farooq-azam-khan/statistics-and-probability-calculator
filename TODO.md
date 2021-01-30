@@ -1,5 +1,6 @@
 # TODO
-* [ ] port to elm
+* [x] port to elm
+* [ ] add notes of relavent topics
 - [ ] implement the central limit theorem for discrete distributions
   - [ ] poission
   - [ ] geometric
