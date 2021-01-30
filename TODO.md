@@ -1,6 +1,8 @@
 # TODO
 * [x] port to elm
 * [ ] add notes of relavent topics
+* [ ] math formula formatting
+* [ ] serif font
 - [ ] implement the central limit theorem for discrete distributions
   - [ ] poission
   - [ ] geometric
