@@ -4,7 +4,8 @@
   "private": true,
   "dependencies": {},
   "scripts": {
-    "dev": "elm-live src/Main.elm -p 8000 -- --debug --output=elm.js"
+    "dev": "elm-live src/Main.elm -p 8000 -- --debug --output=elm.js",
+    "build:tailwindcss": "tailwindcss build src/css/styles.css -o tailwind.css"
   },
   "browserslist": {
     "production": [
@@ -17,5 +18,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.4.0",
+    "autoprefixer": "^10.2.4",
+    "postcss": "^8.2.4",
+    "tailwindcss": "^2.0.2"
   }
 }
