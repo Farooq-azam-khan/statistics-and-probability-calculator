@@ -83,7 +83,7 @@ choose n k =
         n
 
     else
-        factorial n // (factorial n * factorial (n - k))
+        factorial n // (factorial k * factorial (n - k))
 
 
 probability : Distribution -> Int -> Maybe Float
@@ -99,6 +99,9 @@ probability d x =
 
                 c3 =
                     (1 - p) ^ Basics.toFloat (n - x)
+
+                _ =
+                    Debug.log "x c1 c2 c4" ( x, ( c1, c2, c3 ) )
             in
             Just (c1 * c2 * c3)
 
