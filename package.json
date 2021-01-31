@@ -5,6 +5,7 @@
   "dependencies": {},
   "scripts": {
     "dev": "elm-live src/Main.elm -p 8000 -- --debug --output=elm.js",
+    "test": "elm-test --seed 336948560956134",
     "build:tailwindcss": "tailwindcss build src/css/styles.css -o tailwind.css"
   },
   "browserslist": {
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.4.0",
     "autoprefixer": "^10.2.4",
+    "elm-test": "^0.19.1-revision5",
     "postcss": "^8.2.4",
     "tailwindcss": "^2.0.2"
   }
