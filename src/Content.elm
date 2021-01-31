@@ -1,15 +1,12 @@
 module Content exposing (..)
 
--- import Axis
--- import Scale exposing (BandScale, ContinuousScale, defaultBandConfig)
--- import TypedSvg as TS exposing (g, rect, style, svg, text_)
--- import TypedSvg.Attributes exposing (class, textAnchor, transform, viewBox)
--- import TypedSvg.Attributes.InPx exposing (height, width, x, y)
--- import TypedSvg.Core exposing (Svg)
-
+import Distribution exposing (..)
+import Graphs exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import TypedSvg as TS
+import TypedSvg.Attributes as TSA
 import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Types exposing (..)
 
@@ -272,21 +269,6 @@ geometric_distribution =
         ]
 
 
-w : Float
-w =
-    900
-
-
-h : Float
-h =
-    450
-
-
-padding : Float
-padding =
-    30
-
-
 binomial_distribution : Html Msg
 binomial_distribution =
     section [ id "binomial-distribution" ]
@@ -314,8 +296,65 @@ binomial_distribution =
             ]
         , p [] [ text "TODO: proof" ]
         , div []
-            [ h4 [] [ text "Graph" ]
-
-            -- TODO: make graph
+            [ h4 [] [ text "Graph of Binomial Distribution" ]
+            , binomial_distribution_graph
             ]
+        ]
+
+
+bn : Int
+bn =
+    10
+
+
+pb : Probability
+pb =
+    Probability 0.5
+
+
+sample_binomial : Distribution
+sample_binomial =
+    Binomial (Just bn) (Just pb)
+
+
+discrete_input : List Int
+discrete_input =
+    [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+
+
+binomial_data : List ( Int, Float )
+binomial_data =
+    let
+        bin_prob =
+            probability sample_binomial
+    in
+    List.filterMap
+        (\x ->
+            case bin_prob x of
+                Nothing ->
+                    Nothing
+
+                Just y ->
+                    let
+                        _ =
+                            Debug.log "(x,y): " ( x, y )
+                    in
+                    Just ( x, y )
+        )
+        discrete_input
+
+
+binomial_distribution_graph : Html Msg
+binomial_distribution_graph =
+    TS.svg [ TSA.viewBox 0 0 w h ]
+        [ TS.g [ TSA.transform [ Translate (padding - 1) (h - padding) ] ]
+            [ xAxis discrete_input
+            ]
+        , TS.g [ TSA.transform [ Translate (padding - 1) padding ] ] [ yAxis ]
+        , TS.g
+            [ TSA.transform [ Translate padding padding ]
+            , TSA.class [ "series" ]
+            ]
+          <|
+            List.map (column discrete_input) binomial_data
         ]
