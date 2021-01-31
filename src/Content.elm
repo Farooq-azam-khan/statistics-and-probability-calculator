@@ -14,6 +14,12 @@ import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Types exposing (..)
 
 
+independent_formula : String
+independent_formula =
+    create_inline_formula
+        "P(A \\cap B) = P(A) \\cdot P(B)"
+
+
 introduction : Html Msg
 introduction =
     section []
@@ -22,7 +28,7 @@ introduction =
             [ dt [] [ text "Random Experiment" ]
             , dd [] [ text "A random experiment is an experiment where the outcome cannot be predicted with certainty." ]
             , dt [] [ text "Independence" ]
-            , dd [] [ text "Two phenomina are Independent if observing the outcome of the first does not affect the probability of observing the second. P(A and B) = P(A) * P(B)" ]
+            , dd [] [ text ("Two phenomina are Independent if observing the outcome of the first does not affect the probability of observing the second." ++ independent_formula) ]
             ]
         ]
 
