@@ -1,13 +1,9 @@
 module Content exposing (..)
 
 import Distribution exposing (..)
-import Graphs exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import TypedSvg as TS
-import TypedSvg.Attributes as TSA
-import TypedSvg.Types exposing (AnchorAlignment(..), Transform(..))
 import Types exposing (..)
 
 
@@ -297,7 +293,6 @@ binomial_distribution =
         , p [] [ text "TODO: proof" ]
         , div []
             [ h4 [] [ text "Graph of Binomial Distribution" ]
-            , binomial_distribution_graph
             ]
         ]
 
@@ -342,19 +337,3 @@ binomial_data =
                     Just ( x, y )
         )
         discrete_input
-
-
-binomial_distribution_graph : Html Msg
-binomial_distribution_graph =
-    TS.svg [ TSA.viewBox 0 0 w h ]
-        [ TS.g [ TSA.transform [ Translate (padding - 1) (h - padding) ] ]
-            [ xAxis discrete_input
-            ]
-        , TS.g [ TSA.transform [ Translate (padding - 1) padding ] ] [ yAxis ]
-        , TS.g
-            [ TSA.transform [ Translate padding padding ]
-            , TSA.class [ "series" ]
-            ]
-          <|
-            List.map (column discrete_input) binomial_data
-        ]
