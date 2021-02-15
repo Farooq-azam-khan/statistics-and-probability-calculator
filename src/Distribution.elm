@@ -86,24 +86,26 @@ choose n k =
         factorial n // (factorial k * factorial (n - k))
 
 
+binomial_probability : Int -> Probability -> Int -> Float
+binomial_probability n (Probability p) x =
+    let
+        c1 =
+            toFloat (choose n x)
+
+        c2 =
+            p ^ toFloat x
+
+        c3 =
+            (1 - p) ^ toFloat (n - x)
+    in
+    c1 * c2 * c3
+
+
 probability : Distribution -> Int -> Maybe Float
 probability d x =
     case d of
-        Binomial (Just n) (Just (Probability p)) ->
-            let
-                c1 =
-                    toFloat (choose n x)
-
-                c2 =
-                    p ^ Basics.toFloat x
-
-                c3 =
-                    (1 - p) ^ Basics.toFloat (n - x)
-
-                _ =
-                    Debug.log "x c1 c2 c4" ( x, ( c1, c2, c3 ) )
-            in
-            Just (c1 * c2 * c3)
+        Binomial (Just n) (Just p) ->
+            Just (binomial_probability n p x)
 
         Binomial _ _ ->
             Nothing
