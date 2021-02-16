@@ -167,13 +167,23 @@ view model =
 bdy : Model -> Html Msg
 bdy model =
     main_ []
-        [ div [ class "px-3 py-2 mx-auto prose prose-indigo lg:prose-lg" ]
-            [ h1 []
-                [ text "Statistics and Probability" ]
-            , introduction
-            , methods_of_enumeration
-            , discrete_random_variables
-            , mathematical_expectation
+        [ div [ class "grid grid-cols-12 gap-x-3" ]
+            [ aside [ class "col-span-3 bg-gray-100 px-3" ]
+                [ ul []
+                    [ li [] [ a [ href "#" ] [ text "Introduction to\n                    Probability" ] ]
+                    , li [] [ a [ href "#" ] [ text "Methods of Enummeration" ] ]
+                    , li [] [ a [ href "#" ] [ text "Discrete Random Variables" ] ]
+                    ]
+                ]
+            , div [ class "col-span-7 px-3 py-2 mx-auto prose prose-indigo lg:prose-lg" ]
+                [ h1 []
+                    [ text "Statistics and Probability" ]
+                , introduction
+                , methods_of_enumeration
+                , discrete_random_variables
+                , mathematical_expectation
+                ]
+            , aside [ class "col-span-2 bg-gray-100 px-3" ] [ text "aside" ]
             ]
         ]
 
