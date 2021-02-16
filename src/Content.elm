@@ -330,10 +330,6 @@ binomial_data =
                     Nothing
 
                 Just y ->
-                    let
-                        _ =
-                            Debug.log "(x,y): " ( x, y )
-                    in
                     Just ( x, y )
         )
         discrete_input

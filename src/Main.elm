@@ -1,52 +1,79 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Navigation as Nav exposing (Key)
 import Content exposing (..)
 import Debug exposing (toString)
 import Distribution exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Navbar exposing (navbar)
+import Route exposing (..)
 import String
 import Types exposing (..)
+import Url exposing (Url)
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
+    Browser.application
         { init = init
         , view = view
         , update = update
+        , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 
 
 -- INIT
 
 
-init : Model
-init =
-    { selected_distribution = Poission Nothing }
+init : flags -> Url -> Key -> ( Model, Cmd msg )
+init _ url key =
+    ( { url = url, key = key, selected_distribution = Poission Nothing }
+    , Cmd.none
+    )
 
 
 
 -- UPDATE
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
-            model
+            ( model, Cmd.none )
+
+        UrlChanged url ->
+            ( { model | url = url }, Cmd.none )
+
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
 
         SelectBinomial ->
-            { model | selected_distribution = Binomial Nothing Nothing }
+            ( { model | selected_distribution = Binomial Nothing Nothing }
+            , Cmd.none
+            )
 
         SelectGeometric ->
-            { model | selected_distribution = Geometric Nothing }
+            ( { model | selected_distribution = Geometric Nothing }, Cmd.none )
 
         SelectPoission ->
-            { model | selected_distribution = Poission Nothing }
+            ( { model | selected_distribution = Poission Nothing }, Cmd.none )
 
         ChangeGeometricProbability str_val ->
             let
@@ -55,10 +82,14 @@ update msg model =
             in
             case maybe_float of
                 Just float_val ->
-                    { model | selected_distribution = Geometric (Just (Probability float_val)) }
+                    ( { model | selected_distribution = Geometric (Just (Probability float_val)) }
+                    , Cmd.none
+                    )
 
                 Nothing ->
-                    { model | selected_distribution = Geometric Nothing }
+                    ( { model | selected_distribution = Geometric Nothing }
+                    , Cmd.none
+                    )
 
         ChangeBinomialN str_val ->
             let
@@ -73,7 +104,11 @@ update msg model =
                         _ ->
                             Nothing
             in
-            { model | selected_distribution = Binomial maybe_int un_changed_p }
+            ( { model
+                | selected_distribution = Binomial maybe_int un_changed_p
+              }
+            , Cmd.none
+            )
 
         ChangeBinomialP str_val ->
             let
@@ -90,22 +125,62 @@ update msg model =
             in
             case mf of
                 Just f ->
-                    { model | selected_distribution = Binomial unchanged_n (Just (Probability f)) }
+                    ( { model
+                        | selected_distribution =
+                            Binomial unchanged_n
+                                (Just (Probability f))
+                      }
+                    , Cmd.none
+                    )
 
                 Nothing ->
-                    { model | selected_distribution = Binomial unchanged_n Nothing }
+                    ( { model
+                        | selected_distribution =
+                            Binomial unchanged_n
+                                Nothing
+                      }
+                    , Cmd.none
+                    )
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    main_ [ class "px-3 py-2 mx-auto prose prose-indigo lg:prose-lg" ]
-        [ h1 []
-            [ text "Statistics and Probability" ]
-        , introduction
-        , methods_of_enumeration
-        , discrete_random_variables
-        , mathematical_expectation
-        , p [] [ text "Selected Distribution" ]
+    { title = "Statistics"
+    , body =
+        [ navbar
+        , case parseLocation model.url of
+            Home ->
+                bdy model
+
+            Lessons ->
+                bdy model
+
+            Calculator ->
+                calc model
+
+            NotFound ->
+                div [] [ text "not found" ]
+        ]
+    }
+
+
+bdy : Model -> Html Msg
+bdy model =
+    main_ []
+        [ div [ class "px-3 py-2 mx-auto prose prose-indigo lg:prose-lg" ]
+            [ h1 []
+                [ text "Statistics and Probability" ]
+            , introduction
+            , methods_of_enumeration
+            , discrete_random_variables
+            , mathematical_expectation
+            ]
+        ]
+
+
+calc model =
+    div []
+        [ p [] [ text "Selected Distribution" ]
         , div []
             [ div []
                 [ button [ onClick SelectGeometric ] [ text "Geometric" ]
