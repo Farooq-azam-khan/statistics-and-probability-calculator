@@ -2,7 +2,6 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav exposing (Key)
-import Content exposing (..)
 import Debug exposing (toString)
 import Distribution exposing (..)
 import Html exposing (..)
@@ -13,7 +12,9 @@ import Route exposing (..)
 import String
 import Types exposing (..)
 import Url exposing (Url)
+import Lessons exposing(..)
 
+import Content exposing (..)
 
 main : Program () Model Msg
 main =
@@ -34,11 +35,30 @@ subscriptions _ =
 
 
 -- INIT
+discrete_random_variables_lesson : Lesson 
+discrete_random_variables_lesson = Lesson {name = "Discrete Random Variables",  next_lesson =  Nothing, content = discrete_random_variables}
 
+
+
+methods_of_enumeration_lesson : Lesson 
+methods_of_enumeration_lesson = Lesson {name = "Methods of Enumeration",  next_lesson =  Just discrete_random_variables_lesson, content = methods_of_enumeration}
+
+
+
+introduction_lesson : Lesson 
+introduction_lesson = Lesson {name = "Introduction",  next_lesson =  Just methods_of_enumeration_lesson, content = introduction}
+
+
+-- 
+-- mathematical_expectation
 
 init : flags -> Url -> Key -> ( Model, Cmd msg )
 init _ url key =
-    ( { url = url, key = key, selected_distribution = Poission Nothing }
+    ( { url = url
+      , key = key
+      , selected_distribution = Poission Nothing
+      , current_lesson = introduction_lesson
+      , lessons = [introduction_lesson, methods_of_enumeration_lesson, discrete_random_variables_lesson] }
     , Cmd.none
     )
 
@@ -53,6 +73,8 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
+        ChangeCurrentLesson lesson -> 
+            ({model | current_lesson = lesson}, Cmd.none)
         UrlChanged url ->
             ( { model | url = url }, Cmd.none )
 
@@ -150,10 +172,10 @@ view model =
         [ navbar
         , case parseLocation model.url of
             Home ->
-                bdy model
+                lessons_view model
 
             Lessons ->
-                bdy model
+                lessons_view model
 
             Calculator ->
                 calc model
@@ -163,29 +185,6 @@ view model =
         ]
     }
 
-
-bdy : Model -> Html Msg
-bdy model =
-    main_ []
-        [ div [ class "grid grid-cols-12 gap-x-3" ]
-            [ aside [ class "col-span-3 bg-gray-100 px-3" ]
-                [ ul []
-                    [ li [] [ a [ href "#" ] [ text "Introduction to\n                    Probability" ] ]
-                    , li [] [ a [ href "#" ] [ text "Methods of Enummeration" ] ]
-                    , li [] [ a [ href "#" ] [ text "Discrete Random Variables" ] ]
-                    ]
-                ]
-            , div [ class "col-span-7 px-3 py-2 mx-auto prose prose-indigo lg:prose-lg" ]
-                [ h1 []
-                    [ text "Statistics and Probability" ]
-                , introduction
-                , methods_of_enumeration
-                , discrete_random_variables
-                , mathematical_expectation
-                ]
-            , aside [ class "col-span-2 bg-gray-100 px-3" ] [ text "aside" ]
-            ]
-        ]
 
 
 calc model =
